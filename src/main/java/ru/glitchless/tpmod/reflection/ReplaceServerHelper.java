@@ -1,41 +1,21 @@
-package com.example.examplemod;
+package ru.glitchless.tpmod.reflection;
 
 import com.mojang.authlib.HttpAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-@Mod(modid = ExampleMod.MODID, name = ExampleMod.NAME, version = ExampleMod.VERSION)
-public class ExampleMod {
-    public static final String MODID = "examplemod";
-    public static final String NAME = "Example Mod";
-    public static final String VERSION = "1.0";
+public class ReplaceServerHelper {
+    private static final String BASE_URL = "https://game.glitchless.ru/api/minecraft/users/";
 
-    private static Logger logger;
-
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
-        try {
-            //replaceSession();
-            //replaceAuthServer();
-        } catch (Exception e) {
-            logger.error(e);
-            e.printStackTrace();
-        }
+    public void replaceAll() throws Exception {
+        replaceSession();
+        replaceAuthServer();
     }
 
     private void replaceSession() throws Exception {
-        String BASE_URL = "https://minecraft.free.beeceptor.com/session/";
         Field baseUrl = YggdrasilMinecraftSessionService.class.getDeclaredField("BASE_URL");
         Field joinUrl = YggdrasilMinecraftSessionService.class.getDeclaredField("JOIN_URL");
         Field checkUrl = YggdrasilMinecraftSessionService.class.getDeclaredField("CHECK_URL");
@@ -44,11 +24,10 @@ public class ExampleMod {
         checkUrl.setAccessible(true);
         setFinalStatic(baseUrl, BASE_URL);
         setFinalStatic(joinUrl, HttpAuthenticationService.constantURL(BASE_URL + "join"));
-        setFinalStatic(checkUrl, HttpAuthenticationService.constantURL(BASE_URL + "hasJoined"));
+        setFinalStatic(checkUrl, HttpAuthenticationService.constantURL(BASE_URL + "has_joined"));
     }
 
     private void replaceAuthServer() throws Exception {
-        String BASE_URL = "https://minecraft.free.beeceptor.com/authserver/";
         Field baseUrl = YggdrasilUserAuthentication.class.getDeclaredField("BASE_URL");
         Field routeAuthenticate = YggdrasilUserAuthentication.class.getDeclaredField("ROUTE_AUTHENTICATE");
         Field routeRefresh = YggdrasilUserAuthentication.class.getDeclaredField("ROUTE_REFRESH");
@@ -77,11 +56,5 @@ public class ExampleMod {
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
         field.set(null, newValue);
-    }
-
-    @EventHandler
-    public void init(FMLInitializationEvent event) {
-        // some example code
-        logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
 }
