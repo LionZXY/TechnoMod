@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class ReplaceServerHelper {
-    private static final String BASE_URL = "https://game.glitchless.ru/api/minecraft/users/";
+    private static final String BASE_URL = "https://games.glitchless.ru/api/minecraft/users/";
 
     public void replaceAll() throws Exception {
         replaceSession();
