@@ -1,10 +1,18 @@
 package ru.glitchless.tpmod;
 
+import net.minecraft.client.resources.ResourcePackRepository;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 import ru.glitchless.tpmod.reflection.ReplaceServerHelper;
 import ru.glitchless.tpmod.server.PlayerServer;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod(modid = TpMod.MODID, name = TpMod.NAME, version = TpMod.VERSION)
 public class TpMod {
@@ -26,7 +34,31 @@ public class TpMod {
             e.printStackTrace();
         }
         playerServer.init();
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            addTexturePack();
+        }
     }
 
+    private void addTexturePack() {
+        if (!new File("resourcepacks/F32-1.12.2.zip").exists()) {
+            return;
+        }
+
+        ResourcePackRepository repository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+        ResourcePackRepository.Entry faithfulEntry = null;
+        for (ResourcePackRepository.Entry entry : repository.getRepositoryEntriesAll()) {
+            if (entry.getResourcePackName().equals("F32-1.12.2.zip")) {
+                faithfulEntry = entry;
+            }
+        }
+
+        if (faithfulEntry == null) {
+            return;
+        }
+
+        List<ResourcePackRepository.Entry> currentList = new ArrayList<ResourcePackRepository.Entry>(repository.getRepositoryEntries());
+        currentList.add(faithfulEntry);
+        repository.setRepositories(currentList);
+    }
 
 }
