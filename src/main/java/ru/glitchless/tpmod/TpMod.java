@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
+import ru.glitchless.tpmod.config.Config;
 import ru.glitchless.tpmod.reflection.ReplaceServerHelper;
 import ru.glitchless.tpmod.server.PlayerServer;
 
@@ -23,6 +24,7 @@ public class TpMod {
     private static Logger logger;
     private ReplaceServerHelper replaceHelper = new ReplaceServerHelper();
     private PlayerServer playerServer = new PlayerServer();
+    private Config config = new Config();
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -43,11 +45,17 @@ public class TpMod {
         if (!new File("resourcepacks/F32-1.12.2.zip").exists()) {
             return;
         }
+        if (!config.isFirstLaunch()) {
+            return;
+        }
+        String f32Name = "F32-1.12.2.zip";
 
         ResourcePackRepository repository = FMLClientHandler.instance().getClient().getResourcePackRepository();
+
+
         ResourcePackRepository.Entry faithfulEntry = null;
         for (ResourcePackRepository.Entry entry : repository.getRepositoryEntriesAll()) {
-            if (entry.getResourcePackName().equals("F32-1.12.2.zip")) {
+            if (entry.getResourcePackName().equals(f32Name)) {
                 faithfulEntry = entry;
             }
         }
@@ -57,6 +65,11 @@ public class TpMod {
         }
 
         List<ResourcePackRepository.Entry> currentList = new ArrayList<ResourcePackRepository.Entry>(repository.getRepositoryEntries());
+        for (ResourcePackRepository.Entry entry : currentList) {
+            if (entry.getResourcePackName().equals(f32Name)) {
+                return;
+            }
+        }
         currentList.add(faithfulEntry);
         repository.setRepositories(currentList);
     }
