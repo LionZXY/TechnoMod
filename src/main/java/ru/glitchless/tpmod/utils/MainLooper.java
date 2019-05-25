@@ -16,6 +16,7 @@ public class MainLooper {
         for (int i = 0; i < queue.size(); i++) {
             queue.get(i).run();
         }
+        queue.clear();
     }
 
     public void handle(Runnable runnable) {

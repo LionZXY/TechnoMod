@@ -6,19 +6,21 @@ import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.config.Configuration;
+import ru.glitchless.tpmod.items.BackTeleportationItem;
 import ru.glitchless.tpmod.items.RandomTeleportationItem;
 import ru.glitchless.tpmod.reflection.ReplaceServerHelper;
 
 public class CommonInit implements ISide {
     private ReplaceServerHelper replaceHelper = new ReplaceServerHelper();
-    private RandomTeleportationItem baseTeleportationItem = new RandomTeleportationItem();
+    private RandomTeleportationItem randomTeleportationItem = new RandomTeleportationItem();
+    private BackTeleportationItem backTeleportationItem = new BackTeleportationItem();
 
     @Override
     public void preInit() {
         try {
             replaceHelper.replaceAll();
         } catch (Exception e) {
-            TpMod.getLogger().error(e);
+            TpMod.getInstance().getLogger().error(e);
             e.printStackTrace();
         }
 
@@ -26,12 +28,17 @@ public class CommonInit implements ISide {
 
         Configuration.isFirstLaunch = false;
         ConfigManager.sync(TpMod.MODID, Config.Type.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(TpMod.getMainLooper());
+        MinecraftForge.EVENT_BUS.register(TpMod.getInstance().getMainLooper());
     }
 
     private void initItem() {
-        baseTeleportationItem.setUnlocalizedName("tpmod_random");
-        baseTeleportationItem.setRegistryName("tpmod_random_registry_name");
-        ForgeRegistries.ITEMS.register(baseTeleportationItem);
+        randomTeleportationItem.setUnlocalizedName("tpmod_random");
+        randomTeleportationItem.setRegistryName("tpmod_random");
+
+        backTeleportationItem.setUnlocalizedName("tpmod_back");
+        backTeleportationItem.setRegistryName("tpmod_back");
+
+        ForgeRegistries.ITEMS.register(randomTeleportationItem);
+        ForgeRegistries.ITEMS.register(backTeleportationItem);
     }
 }

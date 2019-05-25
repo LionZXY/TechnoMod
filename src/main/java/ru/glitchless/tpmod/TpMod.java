@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
+import ru.glitchless.tpmod.config.DeathHandler;
 import ru.glitchless.tpmod.proxy.ClientInit;
 import ru.glitchless.tpmod.proxy.ISide;
 import ru.glitchless.tpmod.proxy.ServerInit;
@@ -16,20 +17,14 @@ public class TpMod {
     public static final String NAME = "TechnoMain util mod";
     public static final String VERSION = "1.1";
 
-    private static MainLooper mainLooper = new MainLooper();
+    private static TpMod INSTANCE;
+    private MainLooper mainLooper = new MainLooper();
+    private DeathHandler deathHandler = new DeathHandler();
     private static Logger logger;
     private ISide side;
 
-    public static Logger getLogger() {
-        return logger;
-    }
-
-    public static MainLooper getMainLooper() {
-        return mainLooper;
-    }
-
-    public static void setMainLooper(MainLooper mainLooper) {
-        TpMod.mainLooper = mainLooper;
+    public TpMod() {
+        INSTANCE = this;
     }
 
     @Mod.EventHandler
@@ -41,5 +36,21 @@ public class TpMod {
             side = new ServerInit();
         }
         side.preInit();
+    }
+
+    public static TpMod getInstance() {
+        return INSTANCE;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public MainLooper getMainLooper() {
+        return mainLooper;
+    }
+
+    public DeathHandler getDeathHandler() {
+        return deathHandler;
     }
 }

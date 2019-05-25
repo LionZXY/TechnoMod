@@ -45,9 +45,9 @@ public class TeleportDelayThread extends Thread {
                 Thread.sleep(TimeUnit.SECONDS.toMillis(1));
             }
             entityPlayer.sendStatusMessage(new TextComponentString(I18n.format("tpmod.teleporting_text")), true);
-            TpMod.getMainLooper().handle(onTeleport);
+            TpMod.getInstance().getMainLooper().handle(onTeleport);
         } catch (Exception e) {
-            TpMod.getLogger().error(e);
+            TpMod.getInstance().getLogger().error(e);
         }
     }
 }

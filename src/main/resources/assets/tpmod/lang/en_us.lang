@@ -1,4 +1,7 @@
-item.tpmod_random.name=Teleportation Item
+item.tpmod_random.name=Random Teleportation
+item.tpmod_back.name=Back Teleportation
+
 tpmod.delay_teleport_text=Not moving for teleportation %d seconds
 tpmod.moving_teleport_text=Denied teleport because you moving or got damage
 tpmod.teleporting_text=Teleporting...
+tpmod.notback_text=Not found last death location
