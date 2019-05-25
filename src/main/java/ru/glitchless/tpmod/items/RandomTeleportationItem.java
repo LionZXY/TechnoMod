@@ -39,7 +39,7 @@ public class RandomTeleportationItem extends BaseTeleportationItem {
 
         int randomY = findY(worldIn, randomX, randomZ);
 
-        teleportPlayer(player, randomX, randomY, randomZ);
+        teleportPlayer(worldIn, player, randomX, randomY, randomZ);
         SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.endermen.teleport"));
         worldIn.playSound(randomX, randomY, randomZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
     }

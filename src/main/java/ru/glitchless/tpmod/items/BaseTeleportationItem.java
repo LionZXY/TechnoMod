@@ -16,7 +16,7 @@ public abstract class BaseTeleportationItem extends Item {
         this.setCreativeTab(CreativeTabs.MISC);
     }
 
-    public static void teleportPlayer(EntityPlayer entity, int x, int y, int z) {
+    public static void teleportPlayer(World world, EntityPlayer entity, int x, int y, int z) {
         entity.world.getChunkProvider().provideChunk(x, z); //Prerender teleport chunk
 
         entity.motionX = entity.motionY = entity.motionZ = 0D;
@@ -27,6 +27,13 @@ public abstract class BaseTeleportationItem extends Item {
         } else {
             entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
         }
+
+
+        SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.endermen.teleport"));
+        if (event == null) {
+            return;
+        }
+        world.playSound(null, x, y, z, event, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
@@ -42,10 +49,10 @@ public abstract class BaseTeleportationItem extends Item {
             stack.setCount(stack.getCount() - 1);
         }
 
-
         SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.splash_potion.break"));
-        worldIn.playSound(playerIn.posX, playerIn.posY, playerIn.posZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
-
+        if (event != null) {
+            worldIn.playSound(null, playerIn.posX, playerIn.posY, playerIn.posZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        }
         if (!worldIn.isRemote) {
             new TeleportDelayThread(playerIn, new Runnable() {
                 @Override

@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "tpmod:blocks/tpmod_homeset",
+    "up": "tpmod:blocks/tpmod_homeset_upper_active",
+    "north": "tpmod:blocks/tpmod_homeset",
+    "east": "tpmod:blocks/tpmod_homeset",
+    "south": "tpmod:blocks/tpmod_homeset",
+    "west": "tpmod:blocks/tpmod_homeset",
+    "particle": "blocks/iron_block"
+  }
+}

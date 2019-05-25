@@ -1,7 +1,15 @@
 item.tpmod_random.name=Random Teleportation
 item.tpmod_back.name=Back Teleportation
+item.tpmod_home.name=Home Teleportation
+item.tpmod_spawn.name=Spawn Teleportation
+tile.tpmod_homeset.name=Homeset Block
 
 tpmod.delay_teleport_text=Not moving for teleportation %d seconds
 tpmod.moving_teleport_text=Denied teleport because you moving or got damage
 tpmod.teleporting_text=Teleporting...
 tpmod.notback_text=Not found last death location
+tpmod.nothome_text=Not found home
+tpmod.homeset_already_text=Block already use. Deactivate it using empty right click with shift
+tpmod.homeset_clear_text=Homeset clear!
+
+tpmod.homeset_text=Set home to [%s,%s,%s]

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "activatestate=disactivate": {
+      "model": "tpmod:tpmod_homeset"
+    },
+    "activatestate=activate": {
+      "model": "tpmod:tpmod_homeset_active"
+    }
+  }
+}

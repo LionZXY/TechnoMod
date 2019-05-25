@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber
 public class DeathHandler {
-    private TableWorldData<BlockPos> worldTable = null;
+    private TableWorldData worldTable = null;
 
     public DeathHandler() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -36,7 +36,7 @@ public class DeathHandler {
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
-        worldTable = new TableWorldData<>(event.getWorld().getSaveHandler().getWorldDirectory(), "playerdeath");
+        worldTable = new TableWorldData(event.getWorld().getSaveHandler().getWorldDirectory(), "playerdeath");
         worldTable.load();
     }
 

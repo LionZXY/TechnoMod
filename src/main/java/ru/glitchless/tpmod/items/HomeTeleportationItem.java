@@ -7,12 +7,12 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import ru.glitchless.tpmod.TpMod;
 
-public class BackTeleportationItem extends BaseTeleportationItem {
+public class HomeTeleportationItem extends BaseTeleportationItem {
     @Override
     void teleport(World worldIn, EntityPlayer player) {
-        BlockPos blockPos = TpMod.getInstance().getDeathHandler().getLastPlayerDeath(player);
+        BlockPos blockPos = TpMod.getInstance().getHomeStorage().getHome(player);
         if (blockPos == null) {
-            player.sendMessage(new TextComponentString(I18n.format("tpmod.notback_text")));
+            player.sendMessage(new TextComponentString(I18n.format("tpmod.nothome_text")));
             return;
         }
         teleportPlayer(worldIn, player, blockPos.getX(), blockPos.getY(), blockPos.getZ());
