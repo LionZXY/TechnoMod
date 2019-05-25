@@ -1,0 +1,4 @@
+item.tpmod_random.name=Teleportation Item
+tpmod.delay_teleport_text=Not moving for teleportation %d seconds
+tpmod.moving_teleport_text=Denied teleport because you moving or got damage
+tpmod.teleporting_text=Teleporting...
