@@ -1,6 +1,9 @@
 package ru.glitchless.tpmod.items;
 
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -9,6 +12,8 @@ import net.minecraft.world.World;
 import ru.glitchless.tpmod.config.Configuration;
 import ru.glitchless.tpmod.config.DimensionBlockPos;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 
 public class RandomTeleportationItem extends BaseTeleportationItem {
@@ -53,5 +58,11 @@ public class RandomTeleportationItem extends BaseTeleportationItem {
             }
         }
         return 255;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        tooltip.add(I18n.format("item.tpmod_random.description"));
     }
 }

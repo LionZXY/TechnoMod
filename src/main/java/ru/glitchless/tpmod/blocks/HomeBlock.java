@@ -113,7 +113,7 @@ public class HomeBlock extends Block {
         }
         ItemStack stack = playerIn.getHeldItem(hand);
 
-        if (playerIn.isSneaking() && stack == ItemStack.EMPTY) {
+        if (stack == ItemStack.EMPTY) {
             if (removeHome(worldIn, pos)) {
                 playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_clear_text")));
                 return true;

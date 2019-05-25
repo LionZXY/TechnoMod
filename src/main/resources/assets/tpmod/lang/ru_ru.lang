@@ -1,0 +1,22 @@
+item.tpmod_random.name=Красный телепортатор Края
+item.tpmod_back.name=Зеленый телепортатор Края
+item.tpmod_home.name=Оранжевый телепортатор Края
+item.tpmod_spawn.name=Синий телепортатор Края
+tile.tpmod_homeset.name=Маяк восстановления
+
+item.tpmod_random.description=Телепортирует игрока в случайное место на карте
+item.tpmod_back.description=Телепортирует игрока на место последней смерти
+item.tpmod_home.description=Телепортирует игрока к Маяку Восстановления
+item.tpmod_spawn.description=Телепортирует игрока к Маяку Центра Мира
+item.tpmod_homeset.description=Позволяет пользователю телепортироваться при помощи оражевого телепортатора Края
+
+tpmod.delay_teleport_text=Ожидание начала телепортации. Осталось %d секунд! Не двигайтесь!
+tpmod.moving_teleport_text=Телепортация отменена из-за передвижения или получения урона
+tpmod.teleporting_text=Телепортация…
+tpmod.notback_text=Не удается установить местоположение вашей последней смерти
+tpmod.nothome_text=Не удается установить связь с Маяком Восстановления
+tpmod.homeset_already_text=Маяк восстановления уже активирован. Вы можете деактивировать его, нажав на него правой кнопкой мыши с пустой рукой
+tpmod.homeset_clear_text=Маяк восстановления деактивирован
+tpmod.homeset_needitem_text=Для активации нужен оранжевый телепортатор Края
+
+tpmod.homeset_text=Маяк восстановления активирован на [%s,%s,%s]

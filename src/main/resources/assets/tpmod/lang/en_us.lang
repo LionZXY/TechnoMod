@@ -1,16 +1,22 @@
-item.tpmod_random.name=Random Teleportation
-item.tpmod_back.name=Back Teleportation
-item.tpmod_home.name=Home Teleportation
-item.tpmod_spawn.name=Spawn Teleportation
-tile.tpmod_homeset.name=Homeset Block
+item.tpmod_random.name=Red Ender Teleporter
+item.tpmod_back.name=Green Ender Teleporter
+item.tpmod_home.name=Orange Ender Teleporter
+item.tpmod_spawn.name=Blue Ender Teleporter
+tile.tpmod_homeset.name=Restoration Beacon
 
-tpmod.delay_teleport_text=Not moving for teleportation %d seconds
-tpmod.moving_teleport_text=Denied teleport because you moving or got damage
-tpmod.teleporting_text=Teleporting...
-tpmod.notback_text=Not found last death location
-tpmod.nothome_text=Not found home
-tpmod.homeset_already_text=Block already use. Deactivate it using empty right click with shift
-tpmod.homeset_needitem_text=For activation require Ender Warp to home
-tpmod.homeset_clear_text=Homeset clear!
+item.tpmod_random.description=Teleports player to a random location
+item.tpmod_back.description=Teleports player to the last death spot
+item.tpmod_home.description=Teleports player to Restoration Beacon
+item.tpmod_spawn.description=Teleports player to World Center Beacon
+item.tpmod_homeset.description=Allows player to teleport by using Orange Ender Teleporter
 
-tpmod.homeset_text=Set home to [%s,%s,%s]
+tpmod.delay_teleport_text=Waiting for warp to start. %d seconds remaining! Don’t move!
+tpmod.moving_teleport_text=Warp denied due to moving or getting damaged
+tpmod.teleporting_text=Warping…
+tpmod.notback_text=Can’t find your last death spot
+tpmod.nothome_text=Can’t find your restoration beacon
+tpmod.homeset_already_text=Restoration Beacon is already activated. You can deactivate it by rightclick with empty arm
+tpmod.homeset_clear_text=Restoration Beacon deactivated
+tpmod.homeset_needitem_text=Activation requires one Orange Ender Teleporter
+
+tpmod.homeset_text=Restoration Beacon activated at [%s,%s,%s]

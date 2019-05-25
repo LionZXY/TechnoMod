@@ -18,7 +18,7 @@ import ru.glitchless.tpmod.utils.MainLooper;
 public class TpMod {
     public static final String MODID = "tpmod";
     public static final String NAME = "TechnoMain util mod";
-    public static final String VERSION = "1.1";
+    public static final String VERSION = "1.2";
 
     private static TpMod INSTANCE;
     private MainLooper mainLooper = new MainLooper();
