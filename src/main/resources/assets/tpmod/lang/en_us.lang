@@ -10,6 +10,7 @@ tpmod.teleporting_text=Teleporting...
 tpmod.notback_text=Not found last death location
 tpmod.nothome_text=Not found home
 tpmod.homeset_already_text=Block already use. Deactivate it using empty right click with shift
+tpmod.homeset_needitem_text=For activation require Ender Warp to home
 tpmod.homeset_clear_text=Homeset clear!
 
 tpmod.homeset_text=Set home to [%s,%s,%s]

@@ -2,7 +2,6 @@ package ru.glitchless.tpmod.config;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -31,7 +30,7 @@ public class DeathHandler {
         }
 
         EntityPlayerMP entityPlayerMP = (EntityPlayerMP) event.getEntityLiving();
-        worldTable.set(entityPlayerMP.getGameProfile().getId().toString(), entityPlayerMP.getPosition());
+        worldTable.set(entityPlayerMP.getGameProfile().getId().toString(), new DimensionBlockPos(entityPlayerMP));
     }
 
     @SubscribeEvent
@@ -49,7 +48,7 @@ public class DeathHandler {
     }
 
     @Nullable
-    public BlockPos getLastPlayerDeath(EntityPlayer player) {
+    public DimensionBlockPos getLastPlayerDeath(EntityPlayer player) {
         if (worldTable == null) {
             return null;
         }

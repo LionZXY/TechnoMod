@@ -2,7 +2,6 @@ package ru.glitchless.tpmod.config;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import net.minecraft.util.math.BlockPos;
 import ru.glitchless.tpmod.TpMod;
 
 import java.io.File;
@@ -16,8 +15,8 @@ import java.util.Map;
 public class TableWorldData {
     private final File file;
     private final Gson gson = new Gson();
-    private Map<String, BlockPos> userToObject = new HashMap<>();
-    private Type objectType = new TypeToken<Map<String, BlockPos>>() {
+    private Map<String, DimensionBlockPos> userToObject = new HashMap<>();
+    private Type objectType = new TypeToken<Map<String, DimensionBlockPos>>() {
     }.getType();
 
     public TableWorldData(File worldDir, String name) {
@@ -28,11 +27,11 @@ public class TableWorldData {
         this.file = srcFile;
     }
 
-    public BlockPos get(String key) {
+    public DimensionBlockPos get(String key) {
         return userToObject.get(key);
     }
 
-    public void set(String key, BlockPos object) {
+    public void set(String key, DimensionBlockPos object) {
         userToObject.put(key, object);
         save();
     }

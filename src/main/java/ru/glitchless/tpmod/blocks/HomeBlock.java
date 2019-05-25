@@ -15,12 +15,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.glitchless.tpmod.TpMod;
+import ru.glitchless.tpmod.config.DimensionBlockPos;
 import ru.glitchless.tpmod.config.HomeStorage;
 import ru.glitchless.tpmod.items.HomeTeleportationItem;
+import ru.glitchless.tpmod.utils.TextUtils;
 
 import javax.annotation.Nullable;
 
@@ -105,47 +108,28 @@ public class HomeBlock extends Block {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (worldIn.isRemote) {
+        if (worldIn.isRemote || hand == EnumHand.OFF_HAND) {
             return false;
         }
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (!(tileEntity instanceof HomeData)) {
-            return false;
-        }
-        HomeData homeData = (HomeData) tileEntity;
-
         ItemStack stack = playerIn.getHeldItem(hand);
 
         if (playerIn.isSneaking() && stack == ItemStack.EMPTY) {
-            homeData.setUser(null);
-            HomeStorage homeStorage = TpMod.getInstance().getHomeStorage();
-            BlockPos homePos = homeStorage.getHome(homeData.getUserAssign());
-            if (homePos != null && homePos.equals(pos)) {
-                homeStorage.setHome(homeData.getUserAssign(), null);
+            if (removeHome(worldIn, pos)) {
+                playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_clear_text")));
+                return true;
             }
-            playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_clear_text")));
         }
 
-        if (homeData.getUserAssign() != null && homeData.getUserAssign().length() > 0) {
-            playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_already_text")));
-            return true;
+        try {
+            if (setHome(worldIn, pos, stack, playerIn)) {
+                stack = decreaseItemStack(stack);
+                playerIn.setHeldItem(hand, stack);
+                playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_text", pos.getX(), pos.getY(), pos.getY())));
+            }
+        } catch (IllegalArgumentException ex) {
+            playerIn.sendMessage(new TextComponentString(ex.getMessage()));
+            return false;
         }
-
-        if (!(stack.getItem() instanceof HomeTeleportationItem)) {
-            return true;
-        }
-
-        if (stack.getCount() == 1) {
-            stack = ItemStack.EMPTY;
-        } else {
-            stack.setCount(stack.getCount() - 1);
-        }
-        playerIn.setHeldItem(hand, stack);
-
-        homeData.setUser(playerIn);
-        BlockPos blockPos = new BlockPos(pos.getX(), pos.getY() + 2, pos.getZ());
-        TpMod.getInstance().getHomeStorage().setHome(playerIn, blockPos);
-        playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_text", pos.getX(), pos.getY(), pos.getY())));
 
         return true;
     }
@@ -154,28 +138,85 @@ public class HomeBlock extends Block {
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
         if (state.getValue(PROPERTYSTATE).getId() == HomeBlockEnum.ACTIVATE.getId()) {
-
+            setLightLevel(1f);
+        } else {
+            setLightLevel(0f);
         }
     }
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         if (worldIn.isRemote) {
+            super.breakBlock(worldIn, pos, state);
             return;
         }
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
+
+        removeHome(worldIn, pos);
+
+        super.breakBlock(worldIn, pos, state);
+    }
+
+    private boolean setHome(World world, BlockPos pos, ItemStack itemStack, EntityPlayer entityPlayer) throws IllegalArgumentException {
+        final TileEntity tileEntity = world.getTileEntity(pos);
         if (!(tileEntity instanceof HomeData)) {
-            return;
+            return false;
         }
-        HomeData data = (HomeData) tileEntity;
+
+        final HomeData homeData = (HomeData) tileEntity;
+        if (!TextUtils.isEmpty(homeData.getUserAssign())) {
+            throw new IllegalArgumentException(I18n.format("tpmod.homeset_already_text"));
+        }
+
+        if (!(itemStack.getItem() instanceof HomeTeleportationItem)) {
+            throw new IllegalArgumentException(I18n.format("tpmod.homeset_needitem_text"));
+        }
+
+        homeData.setUser(entityPlayer);
+        TpMod.getInstance().getHomeStorage().setHome(entityPlayer, new DimensionBlockPos(pos, world.provider.getDimension()));
+        activeBlock(world, pos);
+        return true;
+    }
+
+    private boolean removeHome(World world, BlockPos pos) {
+        final TileEntity tileEntity = world.getTileEntity(pos);
+        if (!(tileEntity instanceof HomeData)) {
+            return false;
+        }
+
+        final HomeData homeData = (HomeData) tileEntity;
+        if (TextUtils.isEmpty(homeData.getUserAssign())) {
+            return false;
+        }
+
         HomeStorage homeStorage = TpMod.getInstance().getHomeStorage();
 
-        if (data.getUserAssign() != null && data.getUserAssign().length() > 0) {
-            BlockPos homePos = homeStorage.getHome(data.getUserAssign());
-            if (homePos != null && homePos.equals(pos)) {
-                homeStorage.setHome(data.getUserAssign(), null);
-            }
+        BlockPos homePos = homeStorage.getHome(homeData.getUserAssign());
+        if (homePos != null && homePos.equals(pos)) {
+            homeStorage.setHome(homeData.getUserAssign(), null);
         }
-        super.breakBlock(worldIn, pos, state);
+        homeData.setUser(null);
+        disactiveBlock(world, pos);
+        return true;
+    }
+
+    private void activeBlock(World world, BlockPos pos) {
+        world.setLightFor(EnumSkyBlock.BLOCK, pos, 15);
+        world.checkLight(pos);
+        world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE));
+    }
+
+    private void disactiveBlock(World world, BlockPos pos) {
+        world.setLightFor(EnumSkyBlock.BLOCK, pos, 0);
+        world.checkLight(pos);
+        world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE));
+    }
+
+    private ItemStack decreaseItemStack(ItemStack itemStack) {
+        if (itemStack.getCount() == 1) {
+            return ItemStack.EMPTY;
+        } else {
+            itemStack.setCount(itemStack.getCount() - 1);
+            return itemStack;
+        }
     }
 }

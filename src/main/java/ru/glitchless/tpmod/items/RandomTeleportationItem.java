@@ -7,6 +7,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import ru.glitchless.tpmod.config.Configuration;
+import ru.glitchless.tpmod.config.DimensionBlockPos;
 
 import java.util.Random;
 
@@ -15,7 +16,8 @@ public class RandomTeleportationItem extends BaseTeleportationItem {
     private final int DEFAULT_BORDER_RADIUS = 30000000 - 100;
 
     @Override
-    void teleport(World worldIn, EntityPlayer player) {
+    void teleport(EntityPlayer player) {
+        World worldIn = player.world;
         // startX, startZ, endX, endZ
         final String randomTeleportRangeString = Configuration.randomTeleportRange;
         int startX;
@@ -39,7 +41,7 @@ public class RandomTeleportationItem extends BaseTeleportationItem {
 
         int randomY = findY(worldIn, randomX, randomZ);
 
-        teleportPlayer(worldIn, player, randomX, randomY, randomZ);
+        teleportPlayer(player, new DimensionBlockPos(randomX, randomY, randomZ, worldIn.provider.getDimension()));
         SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.endermen.teleport"));
         worldIn.playSound(randomX, randomY, randomZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
     }

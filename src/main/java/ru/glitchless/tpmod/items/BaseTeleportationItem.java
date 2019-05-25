@@ -2,12 +2,13 @@ package ru.glitchless.tpmod.items;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import ru.glitchless.tpmod.config.Configuration;
+import ru.glitchless.tpmod.config.DimensionBlockPos;
 
 public abstract class BaseTeleportationItem extends Item {
 
@@ -16,24 +17,15 @@ public abstract class BaseTeleportationItem extends Item {
         this.setCreativeTab(CreativeTabs.MISC);
     }
 
-    public static void teleportPlayer(World world, EntityPlayer entity, int x, int y, int z) {
-        entity.world.getChunkProvider().provideChunk(x, z); //Prerender teleport chunk
+    public static void teleportPlayer(EntityPlayer entity, DimensionBlockPos dimensionBlockPos) {
+        dimensionBlockPos.teleport(entity);
 
-        entity.motionX = entity.motionY = entity.motionZ = 0D;
-        entity.fallDistance = 0F;
-
-        if (entity instanceof EntityPlayerMP && ((EntityPlayerMP) entity).connection != null) {
-            ((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
-        } else {
-            entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
-        }
-
-
+        World world = DimensionManager.getWorld(dimensionBlockPos.getDimension());
         SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.endermen.teleport"));
         if (event == null) {
             return;
         }
-        world.playSound(null, x, y, z, event, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        world.playSound(null, dimensionBlockPos.getX(), dimensionBlockPos.getY(), dimensionBlockPos.getZ(), event, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
@@ -57,13 +49,13 @@ public abstract class BaseTeleportationItem extends Item {
             new TeleportDelayThread(playerIn, new Runnable() {
                 @Override
                 public void run() {
-                    teleport(worldIn, playerIn);
+                    teleport(playerIn);
                 }
             }).start();
         }
 
-        return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
-    abstract void teleport(World worldIn, EntityPlayer player);
+    abstract void teleport(EntityPlayer player);
 }
