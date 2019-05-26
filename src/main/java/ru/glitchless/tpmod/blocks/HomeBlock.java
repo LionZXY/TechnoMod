@@ -6,7 +6,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,14 +13,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.server.command.TextComponentHelper;
 import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.config.DimensionBlockPos;
 import ru.glitchless.tpmod.config.HomeStorage;
+import ru.glitchless.tpmod.exceptions.MinecraftTextFormattedException;
 import ru.glitchless.tpmod.items.HomeTeleportationItem;
 import ru.glitchless.tpmod.utils.TextUtils;
 
@@ -115,7 +115,7 @@ public class HomeBlock extends Block {
 
         if (stack == ItemStack.EMPTY) {
             if (removeHome(worldIn, pos)) {
-                playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_clear_text")));
+                playerIn.sendMessage(TextComponentHelper.createComponentTranslation(playerIn, "tpmod.homeset_clear_text"));
                 return true;
             }
         }
@@ -124,10 +124,10 @@ public class HomeBlock extends Block {
             if (setHome(worldIn, pos, stack, playerIn)) {
                 stack = decreaseItemStack(stack);
                 playerIn.setHeldItem(hand, stack);
-                playerIn.sendMessage(new TextComponentString(I18n.format("tpmod.homeset_text", pos.getX(), pos.getY(), pos.getY())));
+                playerIn.sendMessage(TextComponentHelper.createComponentTranslation(playerIn, "tpmod.homeset_text", pos.getX(), pos.getY(), pos.getY()));
             }
-        } catch (IllegalArgumentException ex) {
-            playerIn.sendMessage(new TextComponentString(ex.getMessage()));
+        } catch (MinecraftTextFormattedException ex) {
+            playerIn.sendMessage(ex.getReason());
             return false;
         }
 
@@ -156,7 +156,7 @@ public class HomeBlock extends Block {
         super.breakBlock(worldIn, pos, state);
     }
 
-    private boolean setHome(World world, BlockPos pos, ItemStack itemStack, EntityPlayer entityPlayer) throws IllegalArgumentException {
+    private boolean setHome(World world, BlockPos pos, ItemStack itemStack, EntityPlayer entityPlayer) throws MinecraftTextFormattedException {
         final TileEntity tileEntity = world.getTileEntity(pos);
         if (!(tileEntity instanceof HomeData)) {
             return false;
@@ -164,11 +164,11 @@ public class HomeBlock extends Block {
 
         final HomeData homeData = (HomeData) tileEntity;
         if (!TextUtils.isEmpty(homeData.getUserAssign())) {
-            throw new IllegalArgumentException(I18n.format("tpmod.homeset_already_text"));
+            throw new MinecraftTextFormattedException(TextComponentHelper.createComponentTranslation(entityPlayer, "tpmod.homeset_already_text"));
         }
 
         if (!(itemStack.getItem() instanceof HomeTeleportationItem)) {
-            throw new IllegalArgumentException(I18n.format("tpmod.homeset_needitem_text"));
+            throw new MinecraftTextFormattedException(TextComponentHelper.createComponentTranslation(entityPlayer, "tpmod.homeset_needitem_text"));
         }
 
         homeData.setUser(entityPlayer);

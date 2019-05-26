@@ -51,10 +51,10 @@ public class RandomTeleportationItem extends BaseTeleportationItem {
         worldIn.playSound(randomX, randomY, randomZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
     }
 
-    private int findY(World world, int x, int z) {
+    public static int findY(World world, int x, int z) {
         for (int y = 255; y > 0; y--) {
             if (!world.isAirBlock(new BlockPos(x, y, z))) {
-                return y;
+                return y + 1;
             }
         }
         return 255;

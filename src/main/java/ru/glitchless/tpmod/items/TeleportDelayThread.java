@@ -1,9 +1,9 @@
 package ru.glitchless.tpmod.items;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.server.command.TextComponentHelper;
 import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.config.Configuration;
 
@@ -35,16 +35,16 @@ public class TeleportDelayThread extends Thread {
 
                 final BlockPos currentPos = entityPlayer.getPosition();
                 if (!currentPos.equals(initPos) || initHp > entityPlayer.getHealth()) {
-                    String message = I18n.format("tpmod.moving_teleport_text");
-                    entityPlayer.sendMessage(new TextComponentString(message));
-                    entityPlayer.sendStatusMessage(new TextComponentString(message), true);
+                    ITextComponent message = TextComponentHelper.createComponentTranslation(entityPlayer, "tpmod.moving_teleport_text");
+                    entityPlayer.sendMessage(message);
+                    entityPlayer.sendStatusMessage(message, true);
                     return;
                 }
 
-                entityPlayer.sendStatusMessage(new TextComponentString(I18n.format("tpmod.delay_teleport_text", delayRemain)), true);
+                entityPlayer.sendStatusMessage(TextComponentHelper.createComponentTranslation(entityPlayer, "tpmod.delay_teleport_text", delayRemain), true);
                 Thread.sleep(TimeUnit.SECONDS.toMillis(1));
             }
-            entityPlayer.sendStatusMessage(new TextComponentString(I18n.format("tpmod.teleporting_text")), true);
+            entityPlayer.sendStatusMessage(TextComponentHelper.createComponentTranslation(entityPlayer, "tpmod.teleporting_text"), true);
             TpMod.getInstance().getMainLooper().handle(onTeleport);
         } catch (Exception e) {
             TpMod.getInstance().getLogger().error(e);

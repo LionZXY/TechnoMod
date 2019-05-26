@@ -12,7 +12,7 @@ public class Configuration {
     @Config.Comment("delay teleport")
     public static int tpDelay = 5;
 
-    @Config.Comment("random teleport range in blocks. startX, startZ, endX, endZ Example: -100, 100, -100, -100")
+    @Config.Comment("random teleport range in blocks. startX, startZ, endX, endZ Example: -100, -100, 100, 100")
     public static String randomTeleportRange = "";
     public static boolean useRandomTeleportOnlyInOverworld = true;
 }
