@@ -15,7 +15,10 @@ public class SpawnTeleportationItem extends BaseTeleportationItem {
     @Override
     void teleport(EntityPlayer player) {
         World overworld = DimensionManager.getWorld(0);
-        teleportPlayer(player, new DimensionBlockPos(overworld.getSpawnPoint(), overworld.provider.getDimension()));
+        int spawnX = overworld.getSpawnPoint().getX();
+        int spawnY = overworld.getSpawnPoint().getY() + 1;
+        int spawnZ = overworld.getSpawnPoint().getZ();
+        teleportPlayer(player, new DimensionBlockPos(spawnX, spawnY, spawnZ, overworld.provider.getDimension()));
     }
 
     @Override

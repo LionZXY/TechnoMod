@@ -14,6 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -92,6 +93,17 @@ public class HomeBlock extends Block {
     }
 
     @Override
+    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+        IBlockState blockState = world.getBlockState(pos);
+        if (blockState.getPropertyKeys().contains(PROPERTYSTATE) &&
+                blockState.getValue(PROPERTYSTATE) == HomeBlockEnum.ACTIVATE) {
+            return 15;
+        } else {
+            return 1;
+        }
+    }
+
+    @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (!(tileEntity instanceof HomeData)) {
@@ -109,8 +121,9 @@ public class HomeBlock extends Block {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (worldIn.isRemote || hand == EnumHand.OFF_HAND) {
-            return false;
+            return true;
         }
+        TpMod.getInstance().getLogger().error("onBlockActivated", new RuntimeException());
         ItemStack stack = playerIn.getHeldItem(hand);
 
         if (stack == ItemStack.EMPTY) {
@@ -147,12 +160,10 @@ public class HomeBlock extends Block {
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         if (worldIn.isRemote) {
-            super.breakBlock(worldIn, pos, state);
             return;
         }
 
         removeHome(worldIn, pos);
-
         super.breakBlock(worldIn, pos, state);
     }
 
@@ -202,13 +213,13 @@ public class HomeBlock extends Block {
     private void activeBlock(World world, BlockPos pos) {
         world.setLightFor(EnumSkyBlock.BLOCK, pos, 15);
         world.checkLight(pos);
-        world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE));
+        world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.ACTIVATE), 3);
     }
 
     private void disactiveBlock(World world, BlockPos pos) {
         world.setLightFor(EnumSkyBlock.BLOCK, pos, 0);
         world.checkLight(pos);
-        world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE));
+        world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE), 3);
     }
 
     private ItemStack decreaseItemStack(ItemStack itemStack) {

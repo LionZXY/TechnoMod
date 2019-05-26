@@ -20,6 +20,7 @@ public class HomeData extends TileEntity {
             return;
         }
         userAssign = player.getGameProfile().getId().toString();
+        markDirty();
     }
 
     @Nullable

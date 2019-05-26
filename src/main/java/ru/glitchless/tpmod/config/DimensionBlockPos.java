@@ -7,6 +7,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ITeleporter;
+import ru.glitchless.tpmod.TpMod;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +44,11 @@ public class DimensionBlockPos extends BlockPos implements ITeleporter {
     }
 
     @Override
+    public String toString() {
+        return String.format("DimensionBlockPos[x=%s, y=%s, z=%s, dimension=%s]", getX(), getY(), getZ(), getDimension());
+    }
+
+    @Override
     public void placeEntity(World world, Entity entity, float yaw) {
         entity.motionX = entity.motionY = entity.motionZ = 0D;
         entity.fallDistance = 0F;
@@ -58,6 +64,8 @@ public class DimensionBlockPos extends BlockPos implements ITeleporter {
         if (entity == null || entity.world.isRemote) {
             return entity;
         }
+
+        TpMod.getInstance().getLogger().info("Teleport " + entity.getName() + " to " + this);
 
         if (dimension != entity.dimension) {
             return entity.changeDimension(dimension, this);
