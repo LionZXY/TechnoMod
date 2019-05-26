@@ -11,13 +11,14 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.server.command.TextComponentHelper;
 import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.config.DimensionBlockPos;
@@ -27,33 +28,16 @@ import ru.glitchless.tpmod.items.HomeTeleportationItem;
 import ru.glitchless.tpmod.utils.TextUtils;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 public class HomeBlock extends Block {
     public static final PropertyEnum<HomeBlockEnum> PROPERTYSTATE = PropertyEnum.create("activatestate", HomeBlockEnum.class);
+    private long lastTimestamp = 0L; //VERY DIRTY HACK FOR DUPLICATE HACK. FUCK MINECRFT, I'm dunno what happening
+
 
     public HomeBlock() {
         super(Material.IRON);
         this.setCreativeTab(CreativeTabs.MISC);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.SOLID;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState iBlockState) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState iBlockState) {
-        return true;
-    }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState iBlockState) {
-        return EnumBlockRenderType.MODEL;
     }
 
     @Override
@@ -61,10 +45,73 @@ public class HomeBlock extends Block {
         return true;
     }
 
-    @Nullable
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state) {
-        return new HomeData();
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (worldIn.isRemote) {
+            return true;
+        }
+
+        if (System.currentTimeMillis() - lastTimestamp < TimeUnit.SECONDS.toMillis(1)) {
+            return true;
+        }
+
+        lastTimestamp = System.currentTimeMillis();
+
+        ItemStack stack = playerIn.getHeldItem(EnumHand.MAIN_HAND);
+
+        if (stack.isEmpty()) {
+            removeHome(worldIn, pos);
+            playerIn.sendMessage(TextComponentHelper.createComponentTranslation(playerIn, "tpmod.homeset_clear_text"));
+            return true;
+        }
+
+
+        try {
+            if (setHome(worldIn, pos, stack, playerIn)) {
+                decreaseItemStack(stack);
+                playerIn.sendMessage(TextComponentHelper.createComponentTranslation(playerIn, "tpmod.homeset_text", pos.getX(), pos.getY(), pos.getY()));
+            }
+            playerIn.sendMessage(new TextComponentString("Click on block with" + stack.getItem() + " by " + playerIn.getGameProfile().getId()));
+        } catch (MinecraftTextFormattedException ex) {
+            playerIn.sendMessage(ex.getReason());
+        }
+        return true;
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if (!(tileEntity instanceof HomeData)) {
+            return getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE);
+        }
+        HomeData homeData = (HomeData) tileEntity;
+
+        if (TextUtils.isEmpty(homeData.getUserAssign())) {
+            return getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.ACTIVATE);
+        }
+
+        return this.getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE);
+    }
+
+    @Override
+    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+        IBlockState blockState = world.getBlockState(pos);
+        if (blockState.getPropertyKeys().contains(PROPERTYSTATE) &&
+                blockState.getValue(PROPERTYSTATE) == HomeBlockEnum.ACTIVATE) {
+            return 15;
+        } else {
+            return 1;
+        }
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(PROPERTYSTATE).getId();
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, PROPERTYSTATE);
     }
 
     @Override
@@ -82,90 +129,21 @@ public class HomeBlock extends Block {
         return getDefaultState().withProperty(PROPERTYSTATE, homeBlockEnum);
     }
 
+    @Nullable
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(PROPERTYSTATE).getId();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, PROPERTYSTATE);
-    }
-
-    @Override
-    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-        IBlockState blockState = world.getBlockState(pos);
-        if (blockState.getPropertyKeys().contains(PROPERTYSTATE) &&
-                blockState.getValue(PROPERTYSTATE) == HomeBlockEnum.ACTIVATE) {
-            return 15;
-        } else {
-            return 1;
-        }
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (!(tileEntity instanceof HomeData)) {
-            return getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE);
-        }
-        HomeData homeData = (HomeData) tileEntity;
-
-        if (homeData.getUserAssign() != null && homeData.getUserAssign().length() > 0) {
-            return getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.ACTIVATE);
-        }
-
-        return this.getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE);
-    }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (worldIn.isRemote || hand == EnumHand.OFF_HAND) {
-            return true;
-        }
-        TpMod.getInstance().getLogger().error("onBlockActivated", new RuntimeException());
-        ItemStack stack = playerIn.getHeldItem(hand);
-
-        if (stack == ItemStack.EMPTY) {
-            if (removeHome(worldIn, pos)) {
-                playerIn.sendMessage(TextComponentHelper.createComponentTranslation(playerIn, "tpmod.homeset_clear_text"));
-                return true;
-            }
-        }
-
-        try {
-            if (setHome(worldIn, pos, stack, playerIn)) {
-                stack = decreaseItemStack(stack);
-                playerIn.setHeldItem(hand, stack);
-                playerIn.sendMessage(TextComponentHelper.createComponentTranslation(playerIn, "tpmod.homeset_text", pos.getX(), pos.getY(), pos.getY()));
-            }
-        } catch (MinecraftTextFormattedException ex) {
-            playerIn.sendMessage(ex.getReason());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-        if (state.getValue(PROPERTYSTATE).getId() == HomeBlockEnum.ACTIVATE.getId()) {
-            setLightLevel(1f);
-        } else {
-            setLightLevel(0f);
-        }
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        return new HomeData();
     }
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        if (worldIn.isRemote) {
-            return;
+        if (!worldIn.isRemote) {
+            removeHome(worldIn, pos);
         }
 
-        removeHome(worldIn, pos);
         super.breakBlock(worldIn, pos, state);
     }
+
 
     private boolean setHome(World world, BlockPos pos, ItemStack itemStack, EntityPlayer entityPlayer) throws MinecraftTextFormattedException {
         final TileEntity tileEntity = world.getTileEntity(pos);
@@ -210,6 +188,7 @@ public class HomeBlock extends Block {
         return true;
     }
 
+
     private void activeBlock(World world, BlockPos pos) {
         world.setLightFor(EnumSkyBlock.BLOCK, pos, 15);
         world.checkLight(pos);
@@ -222,12 +201,7 @@ public class HomeBlock extends Block {
         world.setBlockState(pos, getDefaultState().withProperty(PROPERTYSTATE, HomeBlockEnum.DISACTIVATE), 3);
     }
 
-    private ItemStack decreaseItemStack(ItemStack itemStack) {
-        if (itemStack.getCount() == 1) {
-            return ItemStack.EMPTY;
-        } else {
-            itemStack.setCount(itemStack.getCount() - 1);
-            return itemStack;
-        }
+    private void decreaseItemStack(ItemStack itemStack) {
+        itemStack.setCount(itemStack.getCount() - 1);
     }
 }

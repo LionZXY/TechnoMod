@@ -31,7 +31,7 @@ public class HomeData extends TileEntity {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        compound.setString(ASSIGN_KEY, gson.toJson(userAssign));
+        compound.setString(ASSIGN_KEY, userAssign);
         return compound;
     }
 
