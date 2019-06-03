@@ -1,6 +1,9 @@
 package ru.glitchless.tpmod.proxy;
 
+import net.minecraft.util.text.translation.LanguageMap;
 import ru.glitchless.tpmod.server.PlayerServer;
+
+import java.io.InputStream;
 
 public class ServerInit extends CommonInit {
     private PlayerServer playerServer = new PlayerServer();
@@ -10,5 +13,11 @@ public class ServerInit extends CommonInit {
         super.preInit();
 
         playerServer.init();
+        changeLanguageForMap();
+    }
+
+    private void changeLanguageForMap() {
+        InputStream is = LanguageMap.class.getResourceAsStream("/assets/minecraft/lang/ru_ru.lang");
+        LanguageMap.inject(is);
     }
 }

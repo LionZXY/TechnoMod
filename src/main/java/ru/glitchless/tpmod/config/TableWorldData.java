@@ -60,4 +60,10 @@ public class TableWorldData {
             TpMod.getInstance().getLogger().error(e);
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof TableWorldData
+                && file.equals(((TableWorldData) obj).file);
+    }
 }

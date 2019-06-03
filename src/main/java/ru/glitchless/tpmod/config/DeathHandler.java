@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nullable;
+import java.io.File;
 
 
 @Mod.EventBusSubscriber
@@ -35,7 +36,15 @@ public class DeathHandler {
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
-        worldTable = new TableWorldData(event.getWorld().getSaveHandler().getWorldDirectory(), "playerdeath");
+        File worldDirectory = event.getWorld().getSaveHandler().getWorldDirectory();
+        TableWorldData twd = new TableWorldData(worldDirectory, "playerdeath");
+        if (worldDirectory == null || twd.equals(worldTable)) {
+            return;
+        }
+        if (worldTable != null) {
+            worldTable.save();
+        }
+        worldTable = twd;
         worldTable.load();
     }
 
