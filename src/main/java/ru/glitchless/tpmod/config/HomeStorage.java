@@ -1,69 +1,84 @@
 package ru.glitchless.tpmod.config;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.minecraft.world.storage.MapStorage;
+import net.minecraft.world.storage.WorldSavedData;
+import ru.glitchless.tpmod.TpMod;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
-@Mod.EventBusSubscriber
-public class HomeStorage {
-    private TableWorldData worldTable = null;
+public class HomeStorage extends WorldSavedData {
+    private static final String DATA_NAME = TpMod.MODID + "_homeset";
+    private Map<String, DimensionBlockPos> dimensionBlockPosMap = new HashMap<>();
+    private Map<DimensionBlockPos, String> dimensionBlockPosPlayerMap = new HashMap<>();
 
     public HomeStorage() {
-        MinecraftForge.EVENT_BUS.register(this);
+        super(DATA_NAME);
     }
 
-    public void setHome(EntityPlayer player, DimensionBlockPos blockPos) {
-        if (worldTable == null) {
-            return;
-        }
-        worldTable.set(player.getGameProfile().getId().toString(), blockPos);
+    public HomeStorage(String dataName) {
+        super(dataName);
     }
 
-    public void setHome(String userId, DimensionBlockPos blockPos) {
-        if (worldTable == null) {
-            return;
+    public static HomeStorage getInstance(World world) {
+        final MapStorage mapStorage = world.getMapStorage();
+        HomeStorage instance = (HomeStorage) mapStorage.getOrLoadData(HomeStorage.class, DATA_NAME);
+
+        if (instance == null) {
+            instance = new HomeStorage();
+            mapStorage.setData(DATA_NAME, instance);
         }
-        worldTable.set(userId, blockPos);
+        return instance;
+    }
+
+    public void setHome(EntityPlayer player, @Nullable DimensionBlockPos blockPos) {
+        final String key = player.getGameProfile().getId().toString();
+        setHome(key, blockPos);
+    }
+
+    public void setHome(String key, @Nullable DimensionBlockPos blockPos) {
+        if (blockPos == null) {
+            dimensionBlockPosPlayerMap.remove(dimensionBlockPosMap.get(key));
+            dimensionBlockPosMap.remove(key);
+        } else {
+            dimensionBlockPosPlayerMap.remove(dimensionBlockPosMap.get(key));
+            dimensionBlockPosPlayerMap.put(blockPos, key);
+            dimensionBlockPosMap.put(key, blockPos);
+        }
+        markDirty();
     }
 
     @Nullable
     public DimensionBlockPos getHome(EntityPlayer player) {
-        if (worldTable == null) {
-            return null;
-        }
-        return worldTable.get(player.getGameProfile().getId().toString());
+        return dimensionBlockPosMap.get(player.getGameProfile().getId().toString());
     }
 
     @Nullable
-    public DimensionBlockPos getHome(String userId) {
-        if (worldTable == null) {
-            return null;
-        }
-        return worldTable.get(userId);
+    public String getHomeByPos(DimensionBlockPos pos) {
+        return dimensionBlockPosPlayerMap.get(pos);
     }
 
-    @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event) {
-        if (event.getWorld().isRemote) {
-            return;
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
+        for (String key : nbt.getKeySet()) {
+            final DimensionBlockPos pos = DimensionBlockPos.readFromNBT(nbt.getCompoundTag(key));
+            dimensionBlockPosMap.put(key, pos);
+            dimensionBlockPosPlayerMap.put(pos, key);
         }
-        worldTable = new TableWorldData(event.getWorld().getSaveHandler().getWorldDirectory(), "playerhomes");
-        worldTable.load();
     }
 
-    @SubscribeEvent
-    public void onWorldSave(WorldEvent.Save event) {
-        if (event.getWorld().isRemote) {
-            return;
+    @Override
+    public NBTTagCompound writeToNBT(@Nonnull NBTTagCompound compound) {
+        for (Map.Entry<String, DimensionBlockPos> entry : dimensionBlockPosMap.entrySet()) {
+            final NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            entry.getValue().writeToNBT(nbtTagCompound);
+            compound.setTag(entry.getKey(), nbtTagCompound);
         }
-        if (worldTable == null) {
-            return;
-        }
-        worldTable.save();
+        return compound;
     }
-
 }

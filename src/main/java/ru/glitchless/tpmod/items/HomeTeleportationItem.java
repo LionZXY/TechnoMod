@@ -6,8 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.server.command.TextComponentHelper;
-import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.config.DimensionBlockPos;
+import ru.glitchless.tpmod.config.HomeStorage;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -15,7 +15,8 @@ import java.util.List;
 public class HomeTeleportationItem extends BaseTeleportationItem {
     @Override
     void teleport(EntityPlayer player) {
-        DimensionBlockPos blockPos = TpMod.getInstance().getHomeStorage().getHome(player);
+        final HomeStorage homeStorage = HomeStorage.getInstance(player.getEntityWorld());
+        DimensionBlockPos blockPos = homeStorage.getHome(player);
         if (blockPos == null) {
             player.sendMessage(TextComponentHelper.createComponentTranslation(player, "tpmod.nothome_text"));
             return;

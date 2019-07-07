@@ -15,8 +15,10 @@ tpmod.moving_teleport_text=Warp denied due to moving or getting damaged
 tpmod.teleporting_text=Warping…
 tpmod.notback_text=Can’t find your last death spot
 tpmod.nothome_text=Can’t find your restoration beacon
+tpmod.homeset_done_text=Restoration Beacon activated
 tpmod.homeset_already_text=Restoration Beacon is already activated. You can deactivate it by rightclick with empty arm
 tpmod.homeset_clear_text=Restoration Beacon deactivated
+tpmod.homeset_allow_error_text=Denied Permission!
 tpmod.homeset_needitem_text=Activation requires one Orange Ender Teleporter
 
 tpmod.homeset_text=Restoration Beacon activated at [%s,%s,%s]

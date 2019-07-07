@@ -2,6 +2,7 @@ package ru.glitchless.tpmod.config;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -10,6 +11,7 @@ import net.minecraftforge.common.util.ITeleporter;
 import ru.glitchless.tpmod.TpMod;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class DimensionBlockPos extends BlockPos implements ITeleporter {
     private final int dimension;
@@ -39,13 +41,35 @@ public class DimensionBlockPos extends BlockPos implements ITeleporter {
         this.dimension = dimension;
     }
 
+    public DimensionBlockPos(Vec3i source, World world) {
+        super(source);
+        this.dimension = world.provider.getDimension();
+    }
+
     public int getDimension() {
         return dimension;
     }
 
+    public static DimensionBlockPos readFromNBT(NBTTagCompound nbt) {
+        int x = nbt.getInteger("x");
+        int y = nbt.getInteger("y");
+        int z = nbt.getInteger("z");
+        int dimension = nbt.getInteger("dimension");
+        return new DimensionBlockPos(x, y, z, dimension);
+    }
+
     @Override
-    public String toString() {
-        return String.format("DimensionBlockPos[x=%s, y=%s, z=%s, dimension=%s]", getX(), getY(), getZ(), getDimension());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DimensionBlockPos)) return false;
+        if (!super.equals(o)) return false;
+        DimensionBlockPos that = (DimensionBlockPos) o;
+        return dimension == that.dimension;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), dimension);
     }
 
     @Override
@@ -73,5 +97,18 @@ public class DimensionBlockPos extends BlockPos implements ITeleporter {
 
         placeEntity(entity.world, entity, entity.rotationYaw);
         return entity;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DimensionBlockPos[x=%s, y=%s, z=%s, dimension=%s]", getX(), getY(), getZ(), getDimension());
+    }
+
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
+        tagCompound.setInteger("x", getX());
+        tagCompound.setInteger("y", getY());
+        tagCompound.setInteger("z", getZ());
+        tagCompound.setInteger("dimension", getDimension());
+        return tagCompound;
     }
 }

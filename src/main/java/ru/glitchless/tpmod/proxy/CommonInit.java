@@ -1,15 +1,12 @@
 package ru.glitchless.tpmod.proxy;
 
 import net.minecraft.item.ItemBlock;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.blocks.HomeBlock;
-import ru.glitchless.tpmod.blocks.HomeData;
 import ru.glitchless.tpmod.config.Configuration;
 import ru.glitchless.tpmod.items.BackTeleportationItem;
 import ru.glitchless.tpmod.items.HomeTeleportationItem;
@@ -65,10 +62,11 @@ public class CommonInit implements ISide {
     private void initBlock() {
         homeBlock.setUnlocalizedName("tpmod_homeset");
         homeBlock.setRegistryName("tpmod_homeset");
+
         ForgeRegistries.BLOCKS.register(homeBlock);
-        GameRegistry.registerTileEntity(HomeData.class, new ResourceLocation("tpmod:homedata"));
 
         homeItemBlock.setRegistryName(homeBlock.getRegistryName());
+
         ForgeRegistries.ITEMS.register(homeItemBlock);
     }
 }

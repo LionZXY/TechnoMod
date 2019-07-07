@@ -8,7 +8,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 import ru.glitchless.tpmod.cmds.SetSpawnCommand;
 import ru.glitchless.tpmod.config.DeathHandler;
-import ru.glitchless.tpmod.config.HomeStorage;
 import ru.glitchless.tpmod.proxy.ClientInit;
 import ru.glitchless.tpmod.proxy.ISide;
 import ru.glitchless.tpmod.proxy.ServerInit;
@@ -23,7 +22,6 @@ public class TpMod {
     private static TpMod INSTANCE;
     private MainLooper mainLooper = new MainLooper();
     private DeathHandler deathHandler = new DeathHandler();
-    private HomeStorage homeStorage = new HomeStorage();
     private static Logger logger;
     private ISide side;
 
@@ -61,9 +59,5 @@ public class TpMod {
 
     public DeathHandler getDeathHandler() {
         return deathHandler;
-    }
-
-    public HomeStorage getHomeStorage() {
-        return homeStorage;
     }
 }

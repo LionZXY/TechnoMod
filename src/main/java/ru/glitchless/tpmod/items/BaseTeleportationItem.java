@@ -35,17 +35,13 @@ public abstract class BaseTeleportationItem extends Item {
         }
 
         ItemStack stack = playerIn.getHeldItem(handIn);
-        if (stack.getCount() == 1) {
-            stack = ItemStack.EMPTY;
-        } else {
-            stack.setCount(stack.getCount() - 1);
-        }
 
         SoundEvent event = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.splash_potion.break"));
         if (event != null) {
             worldIn.playSound(null, playerIn.posX, playerIn.posY, playerIn.posZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
         if (!worldIn.isRemote) {
+            stack.shrink(1);
             new TeleportDelayThread(playerIn, new Runnable() {
                 @Override
                 public void run() {
