@@ -1,10 +1,7 @@
 package ru.glitchless.tpmod.proxy;
 
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.ResourcePackRepository;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import ru.glitchless.tpmod.blocks.HomeBlockEnum;
 import ru.glitchless.tpmod.config.Configuration;
 
 import java.io.File;
@@ -17,26 +14,6 @@ public class ClientInit extends CommonInit {
     public void preInit() {
         super.preInit();
         addTexturePack();
-        initItemTexture();
-        initBlockTexture();
-    }
-
-    private void initItemTexture() {
-        ModelResourceLocation backModelResourceLocation = new ModelResourceLocation("tpmod:tpmod_back", "inventory");
-        ModelResourceLocation homeModelResourceLocation = new ModelResourceLocation("tpmod:tpmod_home", "inventory");
-        ModelResourceLocation randomModelResourceLocation = new ModelResourceLocation("tpmod:tpmod_random", "inventory");
-        ModelResourceLocation spawnModelResourceLocation = new ModelResourceLocation("tpmod:tpmod_spawn", "inventory");
-        ModelLoader.setCustomModelResourceLocation(backTeleportationItem, 0, backModelResourceLocation);
-        ModelLoader.setCustomModelResourceLocation(homeTeleportationItem, 0, homeModelResourceLocation);
-        ModelLoader.setCustomModelResourceLocation(randomTeleportationItem, 0, randomModelResourceLocation);
-        ModelLoader.setCustomModelResourceLocation(spawnTeleportationItem, 0, spawnModelResourceLocation);
-    }
-
-    private void initBlockTexture() {
-        ModelResourceLocation homeModelResourceLocation = new ModelResourceLocation("tpmod:tpmod_homeset", "inventory");
-        ModelLoader.setCustomModelResourceLocation(homeItemBlock, HomeBlockEnum.DISACTIVATE.getId(), homeModelResourceLocation);
-        ModelResourceLocation activeHomeModelResourceLocation = new ModelResourceLocation("tpmod:tpmod_homeset_active", "inventory");
-        ModelLoader.setCustomModelResourceLocation(homeItemBlock, HomeBlockEnum.ACTIVATE.getId(), activeHomeModelResourceLocation);
     }
 
     private void addTexturePack() {
