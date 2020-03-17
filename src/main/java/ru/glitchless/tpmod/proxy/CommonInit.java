@@ -5,9 +5,11 @@ import net.minecraftforge.common.config.ConfigManager;
 import ru.glitchless.tpmod.TpMod;
 import ru.glitchless.tpmod.config.Configuration;
 import ru.glitchless.tpmod.reflection.ReplaceServerHelper;
+import ru.glitchless.tpmod.utils.CrashReporter;
 
 public class CommonInit implements ISide {
     protected ReplaceServerHelper replaceHelper = new ReplaceServerHelper();
+    private CrashReporter reporter;
 
     @Override
     public void preInit() {
@@ -20,5 +22,7 @@ public class CommonInit implements ISide {
 
         Configuration.isFirstLaunch = false;
         ConfigManager.sync(TpMod.MODID, Config.Type.INSTANCE);
+        reporter = new CrashReporter();
+        reporter.init();
     }
 }
