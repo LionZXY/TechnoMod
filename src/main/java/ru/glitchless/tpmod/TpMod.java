@@ -21,7 +21,7 @@ import ru.glitchless.tpmod.utils.IC2LaserDisabler;
 public class TpMod {
     public static final String MODID = "tpmod";
     public static final String NAME = "TechnoMain util mod";
-    public static final String VERSION = "1.3.3";
+    public static final String VERSION = "1.3.4";
 
     private static TpMod INSTANCE;
     private static Logger logger;
