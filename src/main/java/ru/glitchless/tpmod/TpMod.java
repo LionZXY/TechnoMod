@@ -4,10 +4,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
-import ru.glitchless.tpmod.cmds.SetSpawnCommand;
 import ru.glitchless.tpmod.proxy.ClientInit;
 import ru.glitchless.tpmod.proxy.ISide;
 import ru.glitchless.tpmod.proxy.ServerInit;
@@ -40,11 +38,6 @@ public class TpMod {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         side.postInit();
-    }
-
-    @Mod.EventHandler
-    public void onServerStarting(FMLServerStartingEvent event) {
-        event.registerServerCommand(new SetSpawnCommand());
     }
 
     public static TpMod getInstance() {
